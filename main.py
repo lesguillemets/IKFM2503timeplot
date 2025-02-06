@@ -3,7 +3,12 @@ import polars as pl
 
 DATA_DIR = "./data"
 
+DEBUGS = {'load': True}
+
 def main():
+    df = load()
+
+def load():
     # list of tsv files under data/
     original_tsvs = list(pathlib.Path(DATA_DIR).glob("*.tsv"))
     rt_csvs = list(pathlib.Path(DATA_DIR).glob('*.mov.bw.result.csv'))
@@ -29,8 +34,10 @@ def main():
         joined = joined.with_columns(pl.lit(name).alias("ID"))
         dat.append(joined)
     df = pl.concat(dat)
-    with pl.Config(tbl_cols=-1, tbl_rows=-1):
-        print(df)
+    if (DEBUGS['load']):
+        with pl.Config(tbl_cols=-1, tbl_rows=-1):
+            print(df)
+    return df
 
 if __name__ == "__main__":
     main()
