@@ -18,7 +18,19 @@ def main():
                 None)
         if corresponding is not None:
             dat_files.append((tf,corresponding))
-    print(dat_files)
+    ids = map(lambda f: f.stem.split('-')[-1], original_tsvs)
+    dat = []
+    # load each pair of tsv/csv, and join them column-wise
+    for (orig, times) in dat_files:
+        name = orig.stem.split('-')[-1]
+        orig_df = pl.read_csv(orig, has_header=True, separator='\t')
+        times_df = pl.read_csv(times, has_header=True, separator=',')
+        joined = pl.concat([orig_df, times_df], how="horizontal")
+        joined = joined.with_columns(pl.lit(name).alias("ID"))
+        dat.append(joined)
+    df = pl.concat(dat)
+    with pl.Config(tbl_cols=-1, tbl_rows=-1):
+        print(df)
 
 if __name__ == "__main__":
     main()
