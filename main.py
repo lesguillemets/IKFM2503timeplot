@@ -1,5 +1,6 @@
 import pathlib
 import polars as pl
+import matplotlib.pyplot as plt
 
 DATA_DIR = "./data"
 
@@ -7,6 +8,8 @@ DEBUGS = {'load': True}
 
 def main():
     df = load()
+    plot(df)
+
 
 def load():
     # list of tsv files under data/
@@ -38,6 +41,18 @@ def load():
         with pl.Config(tbl_cols=-1, tbl_rows=-1):
             print(df)
     return df
+
+def plot(df: pl.DataFrame):
+    original_tsvs = list(pathlib.Path(DATA_DIR).glob("*.tsv"))
+    ids = map(lambda f: f.stem.split('-')[-1], original_tsvs)
+    fig = plt.figure()
+    ax = fig.subplots()
+    for name in ids:
+        the_data = df.filter( pl.col('ID') == name)
+        ax.plot( the_data['i'], the_data['dur_frames'] )
+    plt.show()
+
+
 
 if __name__ == "__main__":
     main()
