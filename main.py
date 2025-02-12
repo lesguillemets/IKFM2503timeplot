@@ -49,7 +49,8 @@ def plot(df: pl.DataFrame):
     ax = fig.subplots()
     for name in ids:
         the_data = df.filter( pl.col('ID') == name)
-        ax.plot( the_data['i'], the_data['dur_frames'] )
+        ax.plot( the_data['i'], the_data['dur_frames'], label=name)
+    ax.legend()
     plt.show()
 
 
