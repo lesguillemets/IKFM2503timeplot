@@ -1,7 +1,10 @@
 from pathlib import Path
 import pathlib
 import polars as pl
-import matplotlib.pyplot as plt
+
+
+def is_td(name:str) -> bool:
+    return "TCA" not in name
 
 
 def load_clicks(data_dir: Path) -> pl.DataFrame:
@@ -18,7 +21,8 @@ def load_clicks(data_dir: Path) -> pl.DataFrame:
                 None)
         if corresponding is not None:
             dat_files.append((tf,corresponding))
-    return clicks_to_df(dat_files)
+    result = clicks_to_df(dat_files)
+    return ( result.with_columns( pl.col("ID").map_elements(is_td, return_dtype=bool).alias("is_td") ) )
 
 def clicks_to_df(files: list[ tuple[Path,Path] ]) -> pl.DataFrame:
     loaded = pl.concat(map(lambda fl: load_orig_click_pair(fl[0], fl[1]), files))
@@ -45,7 +49,8 @@ def load_reactiontimes(data_dir: Path) -> pl.DataFrame:
                 None)
         if corresponding is not None:
             dat_files.append((tf,corresponding))
-    return rtf_to_df(dat_files)
+    result = rtf_to_df(dat_files)
+    return ( result.with_columns( pl.col("ID").map_elements(is_td, return_dtype=bool).alias("is_td") ) )
 
 def rtf_to_df(files: list[ tuple[Path,Path] ]) -> pl.DataFrame:
     loaded = pl.concat(map(lambda fl: load_orig_rtf_pair(fl[0], fl[1]), files))
@@ -68,8 +73,9 @@ def on_main():
     このモジュールは import して使う想定です
     """
     p = pathlib.Path("./data/use_for_plot/")
-    print(load_clicks(p))
-    print(load_reactiontimes(p))
+    with pl.Config(tbl_cols=-1):
+        print(load_clicks(p))
+        print(load_reactiontimes(p))
 
 
 if __name__ == "__main__":
