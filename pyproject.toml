@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.12"
 polars = "^1.21.0"
 matplotlib = "^3.10.0"
+scipy = "^1.15.1"
 
 
 [build-system]
