@@ -2,7 +2,7 @@ import pathlib
 import polars as pl
 import matplotlib.pyplot as plt
 
-DATA_DIR = "./data"
+DATA_DIR = "./data/use_for_plot/"
 
 DEBUGS = {'load': True}
 
