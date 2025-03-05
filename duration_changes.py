@@ -27,7 +27,25 @@ def plot_time_participants(df: pl.DataFrame):
     plt.savefig('./plot/time_change_par_participants.png')
     plt.show(block=True)
 
+def plot_avg_total_dur(df: pl.DataFrame):
+    # Calculate the average total_dur for each index over participants
+    for cond in (True, False, None):
+        the_data = (df if cond is None else df.filter(pl.col('is_td') == cond)).filter(pl.col('index') > 3)
+        avg_total_dur = the_data.group_by('index').agg(pl.mean('total_dur').alias('avg_total_dur')).sort('index')
+        print(avg_total_dur)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.plot(avg_total_dur['index'], avg_total_dur['avg_total_dur'], label='Average Total Duration', color='blue')
+        for index in avg_total_dur['index']:
+            actual_durs = the_data.filter(pl.col('index') == index)['total_dur']
+            ax.scatter([index] * len(actual_durs), actual_durs, color='red', alpha=0.5)
+        ax.set_xlabel('Index')
+        ax.set_ylabel('Total Duration')
+        ax.legend()
+        plt.tight_layout()
+        plt.savefig('./plot/avg_total_dur.png')
+        plt.show(block=True)
 
 if __name__ == "__main__":
     df = load_reactiontimes(DATA_DIR)
+    plot_avg_total_dur(df)
     plot_time_participants(df)
